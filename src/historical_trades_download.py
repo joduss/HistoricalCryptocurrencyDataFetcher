@@ -7,6 +7,7 @@ from typing import IO, List
 
 # Gets the aggregated trades from binance, from id 'start_id' for a pair 'pair'
 # and saves each record in a csv file located at 'save_file_path'
+# CSV contains data: price, volume, time, id
 
 
 # Api request configuration
