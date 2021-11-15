@@ -3,6 +3,17 @@ import json
 import time
 import urllib.request
 from typing import IO, List
+import argparse
+import os
+from time import sleep
+
+parser = argparse.ArgumentParser(description='Download all aggregated trades data. Starts from the latest in the output file.')
+parser.add_argument('--pair', '-p', type=str, required=True,
+                    help='The pair for which to fetch data. Ex: ETHUSDT')
+parser.add_argument('--output', '-o', type=str, required=True,
+                    help='Output file.')
+
+args = parser.parse_args()
 
 
 # Gets the aggregated trades from binance, from id 'start_id' for a pair 'pair'
@@ -13,10 +24,27 @@ from typing import IO, List
 # Api request configuration
 # ================
 
-pair = "ETHUSDT"
-start_id = 157318999 + 1
+pair = args.pair
+save_file_path: str = args.output
 
-save_file_path: str = "../trades_eth-usd.csv"
+start_id = 0
+
+if (os.path.exists(save_file_path)):
+    with open(save_file_path, 'r') as file:
+        file.seek(0, os.SEEK_END)
+        file.seek(file.tell() - 2, os.SEEK_SET)
+
+        while file.read(1) != '\n': # go back until new line is found
+            file.seek(file.tell() - 2, os.SEEK_SET)
+
+        lastline = file.readline()
+        print(lastline)
+        start_id = int(lastline.split(',')[-1]) + 1
+
+        print(f"Will start fetching from ID = {start_id}")
+        sleep(10)
+
+
 
 
 # Api client configuration
